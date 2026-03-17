@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技術能力展示</title>
+    <style>
+        /* 基礎樣式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 全域樣式 */
+        body {
+            min-height: 100vh;
+            padding: 40px 20px;
+            font-family: "Inter", "Microsoft JhengHei", Arial, sans-serif;
+            line-height: 1.7;
+            background-color: #f8f9fa;
+            color: #2d3748;
+        }
+
+        /* 網頁大標題樣式 */
+        .main-title {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0 auto 36px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
+            max-width: 1200px;
+            letter-spacing: -0.5px;
+        }
+
+        /* 響應式表格容器 */
+        .table-container {
+            overflow-x: auto;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            background-color: #ffffff;
+            margin-bottom: 40px; /* 新增：多列之間的間距 */
+        }
+
+        /* 表格樣式 */
+        .image-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        /* 通用單元格樣式 */
+        .image-table td {
+            border: none;
+            padding: 16px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        /* 第 0 行：大標和註解專屬樣式 */
+        .header-note {
+            font-weight: 500;
+            background-color: #ffffff;
+            font-size: 1.1rem;
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .header-note ul {
+            margin-left: 20px;
+            color: #4a5568;
+            list-style: disc;
+            gap: 8px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 第一行：標題列加底色 (原圖、合成等) */
+        .title-row td {
+            background-color: #f7fafc;
+            font-weight: 600;
+            white-space: nowrap;
+            height: 60px;
+            color: #2d3748;
+            padding: 0 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* 圖片容器樣式 */
+        .img-wrapper {
+            width: 100%;
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 8px;
+            background-color: #fafafa;
+            transition: transform 0.2s ease;
+            cursor: pointer; /* 滑鼠變手型，提示可點擊 */
+        }
+
+        .img-wrapper:hover {
+            transform: scale(1.02);
+        }
+
+        .img-wrapper img {
+            height: 90%;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* 內容行樣式 */
+        .image-table tr.image-row td {
+            padding: 24px;
+            border-bottom: 1px solid #f0f0f0; /* 新增：行之間的分隔線 */
+        }
+        
+        .image-table tr.image-row:last-child td {
+            border-bottom: none; /* 最後一行移除分隔線 */
+        }
+
+        /* -------- 新增：圖片放大燈箱樣式 -------- */
+        .lightbox {
+            display: none; /* 預設隱藏 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90vh;
+        }
+
+        .lightbox-img {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 8px;
+        }
+
+        /* 左右箭頭按鈕 */
+        .lightbox-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            z-index: 10;
+        }
+
+        .lightbox-btn:hover {
+            background-color: white;
+        }
+
+        .prev-btn {
+            left: -60px;
+        }
+
+        .next-btn {
+            right: -60px;
+        }
+
+        /* 關閉按鈕 */
+        .close-btn {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .close-btn:hover {
+            background-color: white;
+        }
+
+        /* 響應式調整 */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 1.8rem;
+                margin-bottom: 24px;
+                padding-bottom: 12px;
+            }
+            .img-wrapper {
+                height: 140px;
+            }
+            .image-table td {
+                padding: 8px !important;
+            }
+            .header-note {
+                font-size: 1rem;
+                padding: 16px 16px 12px;
+            }
+            .title-row td {
+                padding: 0 16px !important;
+                height: 50px;
+            }
+            .table-container {
+                border-radius: 8px;
+                margin-bottom: 20px;
+            }
+            /* 手機端箭頭調整 */
+            .lightbox-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            .prev-btn {
+                left: -50px;
+            }
+            .next-btn {
+                right: -50px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 20px 10px;
+            }
+            .main-title {
+                font-size: 1.5rem;
+            }
+            .img-wrapper {
+                height: 120px;
+            }
+            .header-note ul {
+                margin-left: 16px;
+            }
+            /* 手機端箭頭進一步調整 */
+            .prev-btn {
+                left: 10px;
+            }
+            .next-btn {
+                right: 10px;
+            }
+            .close-btn {
+                top: -10px;
+                right: -10px;
+            }
+        }
+    </style>
+    <!-- 引入現代無襯線字體 -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+</head>
+<body>
+    <!-- 網頁大標題 -->
+    <h1 class="main-title">🔧 AI 圖像技術能力展示</h1>
+
+    <div class="table-container">
+        <table class="image-table">
+            <tr>
+                <td colspan="5" class="header-note">
+                    <ul>
+                        <li>商品場景合成與氛圍營造：可將單一商品原圖，靈動融入多種商業場景（如清新居家、質感櫃台、水漾氛圍、電商海報等），同時支援文案排版與氛圍打光，快速生成高質感宣傳素材。</li>
+                        <li>人像服裝實景還原：能將服裝平面展示圖，轉化為真人穿搭實景，還原不同姿態、場景下的上身效果，幫助直觀呈現服裝版型與穿搭氛圍。</li>
+                        <li>場景化產品呈現：可為功能型產品（如護眼檯燈）打造對應使用場景（書房、宿舍、辦公桌等），同時疊加功能說明與行銷標語，強化產品實用感知。</li>
+						<li>一站式後製工具鏈：熟練使用「AI 去背」「橡皮擦」「合成」「調色」「打光」等工具，可靈活完成從去背、場景替換到氛圍優化的全流程操作，大幅提升圖片製作效率。</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr class="title-row">
+                <td>原圖</td>
+                <td>合成1</td>
+                <td>合成2</td>
+                <td>合成3</td>
+                <td>合成4</td>
+            </tr>
+            <!-- 第一行：化妝水系列 -->
+            <tr class="image-row">
+                <td><div class="img-wrapper" data-group="cosmetic" data-index="0"><img src="2026.03.14 化妝水/原產.jpg" alt="化妝水原圖"></div></td>
+                <td><div class="img-wrapper" data-group="cosmetic" data-index="1"><img src="2026.03.14 化妝水/稿定_蓝色清爽水花洗面奶护肤品商品主图产品主图AIGC.jpg" alt="化妝水合成1"></div></td>
+                <td><div class="img-wrapper" data-group="cosmetic" data-index="2"><img src="2026.03.14 化妝水/jimeng-2026-03-15-7464-為這個產品設計一個好看的展示圖，添加環境背景，需要保持產品的一致性完全一樣.png" alt="化妝水合成2"></div></td>
+                <td><div class="img-wrapper" data-group="cosmetic" data-index="3"><img src="2026.03.14 化妝水/豆包_生成产品展示图.png" alt="化妝水合成3"></div></td>
+                <td><div class="img-wrapper" data-group="cosmetic" data-index="4"><img src="2026.03.14 化妝水/IOPaint2_PS後.png" alt="化妝水合成4"></div></td>
+            </tr>
+            <!-- 第二行：洋裝系列 -->
+            <tr class="image-row">
+                <td><div class="img-wrapper" data-group="dress" data-index="0"><img src="2026.03.15 洋裝/產品正+背面.png" alt="洋裝原圖"></div></td>
+                <td><div class="img-wrapper" data-group="dress" data-index="1"><img src="2026.03.15 洋裝/豆包_模特穿连衣裙搭配件.png" alt="洋裝合成1"></div></td>
+                <td><div class="img-wrapper" data-group="dress" data-index="2"><img src="2026.03.15 洋裝/豆包_新对话.png" alt="洋裝合成2"></div></td>
+                <td><div class="img-wrapper" data-group="dress" data-index="3"><img src="2026.03.15 洋裝/jimeng-2026-03-17-5049-复古港风写真，90 年代香港街拍，年轻东亚女性，黑色羊毛卷大波浪长发，红唇妆容，....png" alt="洋裝合成3"></div></td>
+                <td><div class="img-wrapper" data-group="dress" data-index="4"><img src="2026.03.15 洋裝/豆包_少女.png" alt="洋裝合成4"></div></td>
+            </tr>
+            <!-- 第三行：檯燈系列 -->
+            <tr class="image-row">
+                <td><div class="img-wrapper" data-group="lamp" data-index="0"><img src="2026.03.17 檯燈/原產.png" alt="檯燈原圖"></div></td>
+                <td><div class="img-wrapper" data-group="lamp" data-index="1"><img src="2026.03.17 檯燈/jimeng-2026-03-17-4667-一個合適且好看的展示照片.png" alt="檯燈合成1"></div></td>
+                <td><div class="img-wrapper" data-group="lamp" data-index="2"><img src="2026.03.17 檯燈/CANVA_Grey Best Sofa Recomendation Product Display Instagram Post.png" alt="檯燈合成2"></div></td>
+                <td><div class="img-wrapper" data-group="lamp" data-index="3"><img src="2026.03.17 檯燈/开学季家电台灯直通车主图.jpg" alt="檯燈合成3"></div></td>
+                <td><div class="img-wrapper" data-group="lamp" data-index="4"><img src="2026.03.17 檯燈/生成产品场景图.png" alt="檯燈合成4"></div></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 圖片放大燈箱 -->
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-content">
+            <button class="close-btn" id="closeBtn">&times;</button>
+            <button class="lightbox-btn prev-btn" id="prevBtn">&#10094;</button>
+            <img src="" alt="放大圖片" class="lightbox-img" id="lightboxImg">
+            <button class="lightbox-btn next-btn" id="nextBtn">&#10095;</button>
+        </div>
+    </div>
+
+    <script>
+        // 獲取元素
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const closeBtn = document.getElementById('closeBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        // 圖片數據配置（分組管理）
+        const imageGroups = {
+            // 化妝水系列
+            cosmetic: [
+                '2026.03.14 化妝水/原產.jpg',
+                '2026.03.14 化妝水/稿定_蓝色清爽水花洗面奶护肤品商品主图产品主图AIGC.jpg',
+                '2026.03.14 化妝水/jimeng-2026-03-15-7464-為這個產品設計一個好看的展示圖，添加環境背景，需要保持產品的一致性完全一樣.png',
+                '2026.03.14 化妝水/豆包_生成产品展示图.png',
+                '2026.03.14 化妝水/IOPaint2_PS後.png'
+            ],
+            // 洋裝系列
+            dress: [
+                '2026.03.15 洋裝/產品正+背面.png',
+                '2026.03.15 洋裝/豆包_模特穿连衣裙搭配件.png',
+                '2026.03.15 洋裝/豆包_新对话.png',
+                '2026.03.15 洋裝/jimeng-2026-03-17-5049-复古港风写真，90 年代香港街拍，年轻东亚女性，黑色羊毛卷大波浪长发，红唇妆容，....png',
+                '2026.03.15 洋裝/豆包_少女.png'
+            ],
+            // 檯燈系列
+            lamp: [
+                '2026.03.17 檯燈/原產.png',
+                '2026.03.17 檯燈/jimeng-2026-03-17-4667-一個合適且好看的展示照片.png',
+                '2026.03.17 檯燈/CANVA_Grey Best Sofa Recomendation Product Display Instagram Post.png',
+                '2026.03.17 檯燈/开学季家电台灯直通车主图.jpg',
+                '2026.03.17 檯燈/生成产品场景图.png'
+            ]
+        };
+
+        // 當前顯示的圖片分組和索引
+        let currentGroup = '';
+        let currentIndex = 0;
+
+        // 打開燈箱
+        document.querySelectorAll('.img-wrapper').forEach(wrapper => {
+            wrapper.addEventListener('click', function() {
+                currentGroup = this.dataset.group;
+                currentIndex = parseInt(this.dataset.index);
+                // 設置當前圖片路徑
+                lightboxImg.src = imageGroups[currentGroup][currentIndex];
+                // 顯示燈箱
+                lightbox.classList.add('active');
+                // 鎖定body滾動
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        // 關閉燈箱
+        closeBtn.addEventListener('click', function() {
+            lightbox.classList.remove('active');
+            // 恢復body滾動
+            document.body.style.overflow = '';
+        });
+
+        // 點擊燈箱背景關閉
+        lightbox.addEventListener('click', function(e) {
+            if (e.target === lightbox) {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // 上一張
+        prevBtn.addEventListener('click', function() {
+            if (!currentGroup) return;
+            currentIndex = (currentIndex - 1 + imageGroups[currentGroup].length) % imageGroups[currentGroup].length;
+            lightboxImg.src = imageGroups[currentGroup][currentIndex];
+        });
+
+        // 下一張
+        nextBtn.addEventListener('click', function() {
+            if (!currentGroup) return;
+            currentIndex = (currentIndex + 1) % imageGroups[currentGroup].length;
+            lightboxImg.src = imageGroups[currentGroup][currentIndex];
+        });
+
+        // 鍵盤方向鍵控制
+        document.addEventListener('keydown', function(e) {
+            if (lightbox.classList.contains('active')) {
+                if (e.key === 'ArrowLeft') {
+                    prevBtn.click();
+                } else if (e.key === 'ArrowRight') {
+                    nextBtn.click();
+                } else if (e.key === 'Escape') {
+                    closeBtn.click();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
